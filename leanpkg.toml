@@ -1,0 +1,9 @@
+[package]
+name = "lean-step"
+version = "0.1"
+lean_version = "jesse-michael-han/lean:lean-tpe7"
+path = "src"
+
+[dependencies]
+mathlib = {git = "https://github.com/leanprover-community/mathlib", rev = "33483a3de6d91066e0fb9efd6aa4c0275d7ac44c"}
+lean-tpe = {git = "https://github.com/jesse-michael-han/lean-tpe-public", rev = "master"}

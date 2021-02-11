@@ -1,0 +1,32 @@
+list.partition_eq_filter_filter nat list
+list.filter_append nat list
+list.filter_sublist nat list
+list.append_nil nat list
+list.append_assoc nat list
+list.length_append nat list
+list.length_repeat nat list
+list.length_tail nat list
+list.map_append nat list
+list.map_id nat list
+list.map_map nat list
+list.length_map nat list
+list.nil_bind nat list
+list.cons_bind nat list
+list.append_bind nat list
+list.qsort_nil list
+nat.binary_rec nat
+nat.bodd_bit nat
+nat.shiftl'_sub nat
+nat.test_bit_succ nat
+nat.bitwise_bit_aux nat
+nat.bitwise_zero_left nat
+nat.bitwise_zero_right nat
+nat.bitwise_zero nat
+nat.bitwise_bit nat
+nat.bitwise_swap nat
+nat.bodd_succ nat
+nat.bodd_mul nat
+nat.mod_two_of_bodd nat
+nat.bodd_add_div2 nat
+nat.bit_val nat
+nat.gcd_zero_left nat well_founded

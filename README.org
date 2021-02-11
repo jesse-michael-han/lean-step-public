@@ -1,0 +1,94 @@
+#+TITLE: Proof artifact co-training on Lean mathlib
+
+* LeanStep proof term datasets
+This repository contains utilities for extracting various machine learning datasets from the proof terms of Lean's `mathlib`.
+
+** Supported datasets
+Currently, we support the following datasets for the following tasks:
+
+*** Classification tasks
+**** Proof step classification
+Analogous to the ~HOLStep~ classification task. For every subterm of a proof term, we can extract the following binary classification example: conditioned on the current tactic state, i.e. all the local constants in scope and the goal, then for a given local constant (i.e. a variable bound under a quantifier through which has already been passed while traversing the term), predict whether it occurs in the subterm.
+
+**** Premise classification
+Related to the previous task. For every subterm of a proof term, and for every lemma in the library, we can produce a binary classification example: conditioned on the current tactic state, is the lemma used in the subterm?
+
+*** Seq2seq tasks
+**** Theorem name prediction
+Conditioned on the type of a theorem, predict the human-supplied name.
+
+**** Next-lemma prediction
+Analogous to the MetaMath GPT-f task. Conditioned on the goal state, predicts either the name or type of the next lemma that should be applied.
+
+**** Proof term prediction
+Conditioned on the goal state, predict a Lean expression which inhabits the goal type.
+
+**** Skip-tree training on proof terms
+Conditioned on a pretty-printed proof term with a subterm masked out, predict the missing subterm.
+
+**** Masked type prediction on proof terms
+Conditioned on a pretty-printed proof term with a subterm masked out, predict the type of the missing subterm
+
+**** Elaboration tasks
+ - Tactic state elaboration
+   - Input: pretty-printed tactic state; output: verbose tactic state
+
+ - Proof term elaboration
+   - Input: pretty-printed proof term; output: verbose proof term
+
+ - Result elaboration
+   - Input: partial result term; output: verbose partial result term
+     
+** Raw dataset generation
+#+begin_src bash
+git clone git@github.com:jesse-michael-han/lean-step-public $LEAN_STEP_DIR
+
+cd $LEAN_STEP_DIR
+
+git checkout origin/leanstep-gptf
+
+leanpkg configure
+
+bash ./_target/deps/mathlib/scripts/mk_all.sh
+
+leanpkg build # needs to build everything, takes 20-30m
+
+# test full data pipeline
+
+## test parallel_data_gen, inspect some of the .out/.json files
+
+python ./python/parallel_gen_data.py ./test/test0.names ./test/test_parallel/ 8 5000 100 2000 4
+
+## test lean_step dataset extraction, inspect some of the .json files
+
+python ./python/lean_step.py ./test/test_parallel/ ./test/test_data_gen/
+
+# run the full raw data pipeline
+
+RAW_DATA_DIR="TODO: populate"
+N_WORKERS=16
+REC_LIMIT=5000 # conservative value: 3000
+DEPTH_LIMIT=100 # conservative value: 64
+WEIGHT_LIMIT=2000 # conservative value: 1500
+DECLS_PER_SHARD=100
+
+python ./python/parallel_gen_data.py ./data/decls_split/train.names $RAW_DATA_DIR $N_WORKERS $REC_LIMIT $DEPTH_LIMIT $WEIGHT_LIMIT $DECLS_PER_SHARD
+#+end_src
+
+** Dataset extraction
+Assumes that ~data_dir~ created by ~python/parallel_gen_data.py~ already exists.
+
+Use ~python/lean_step.py~
+#+begin_src bash
+usage: lean_step.py [-h] data_dir dest_dir
+
+positional arguments:
+  data_dir    directory containing shard_{k}.json files created by
+              parallel_data_gen
+  dest_dir    destination directory JSONlines-formatted dataset files
+              extracted from data_dir
+
+optional arguments:
+  -h, --help  show this help message and exit
+#+end_src
+
