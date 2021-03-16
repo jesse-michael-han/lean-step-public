@@ -45,7 +45,7 @@ git clone git@github.com:jesse-michael-han/lean-step-public $LEAN_STEP_DIR
 
 cd $LEAN_STEP_DIR
 
-git checkout origin/leanstep-gptf
+# git checkout origin/leanstep-gptf
 
 leanpkg configure
 
