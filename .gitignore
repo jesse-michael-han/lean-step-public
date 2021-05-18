@@ -132,7 +132,6 @@
 /python/.pyre/**/*~
 **/*~
 /python/virtualenv/
-/*Python*
 /data/
 **/__pycache
 **/*/__pycache__/
