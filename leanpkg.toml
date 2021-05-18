@@ -1,9 +1,10 @@
 [package]
 name = "lean-step"
 version = "0.1"
-lean_version = "leanprover-community/lean:3.26.0"
+lean_version = "leanprover-community/lean:3.30.0"
 path = "src"
 
 [dependencies]
-mathlib = {git = "https://github.com/leanprover-community/mathlib", rev = "95454452f6b3569bf967d35aab8d852b1ddf8017"}
+mathlib = {git = "https://github.com/leanprover-community/mathlib", rev = "fc94b47f2eb3a02155902dc08327dce74b51ec44"}
+lean-liquid = {git = "https://github.com/leanprover-community/lean-liquid", rev = "976a43fd559803e683a868dcd6a540d3a6936948"}
 lean-tpe = {git = "https://github.com/jesse-michael-han/lean-tpe-public", rev = "master"}
