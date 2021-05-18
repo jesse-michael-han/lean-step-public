@@ -135,3 +135,5 @@
 /data/
 **/__pycache
 **/*/__pycache__/
+
+src/all.lean
