@@ -38,20 +38,20 @@ Conditioned on a pretty-printed proof term with a subterm masked out, predict th
 
  - Result elaboration
    - Input: partial result term; output: verbose partial result term
-     
+
+
 ** Raw dataset generation
+
 #+begin_src bash
 git clone git@github.com:jesse-michael-han/lean-step-public $LEAN_STEP_DIR
 
 cd $LEAN_STEP_DIR
 
-# git checkout origin/leanstep-gptf
-
 leanpkg configure
 
-bash ./_target/deps/mathlib/scripts/mk_all.sh
+python python/make_all_lean.py  # generates src/all.lean
 
-leanpkg build # needs to build everything, takes 20-30m
+leanpkg build  # needs to build everything, takes 20-30m
 
 # test full data pipeline
 
