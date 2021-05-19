@@ -1,4 +1,4 @@
-import utils.util
+import .util
 
 section tactic
 open tactic

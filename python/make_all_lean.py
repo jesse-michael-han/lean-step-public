@@ -52,7 +52,7 @@ def _main():
                 i = "import " + str(file_name)[len(p) + 1 : -5].replace("/", ".")
                 imports += [i]
     with open("src/all.lean", "w") as w:
-        for i in sorted(imports):
+        for i in sorted(list(set(imports))):
             w.write(f"{i}\n")
 
 

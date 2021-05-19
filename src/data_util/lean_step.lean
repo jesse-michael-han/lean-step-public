@@ -3,7 +3,6 @@ import data_util.basic
 section LeanStep
 
 
-
 @[derive has_to_format]
 meta structure LeanStepDatapoint : Type :=
 (decl_nm : name)
@@ -175,11 +174,11 @@ meta def extract_next_lemma : expr → tactic (expr × expr)
 | _ := tactic.fail "[extract_next_lemma] not an application"
 
 
-section 
+section
 open native
 meta def rb_set.union {α} : rb_set α → rb_set α → rb_set α :=
 λ s₁ s₂, rb_set.fold s₁ s₂ $ flip rb_set.insert
-end 
+end
 
 local notation `LEAN_STEP_TRACE` := ff
 
@@ -187,15 +186,15 @@ meta def lean_step_trace (fmt : format) : tactic unit := do {
   when LEAN_STEP_TRACE $ tactic.trace fmt
 }
 
-meta def lean_step_main_core_aux 
-  (decl_nm : name) 
-  (decl_tp : expr) 
-  (decl_premises : list (expr × expr)) 
-  (main_pf : expr) 
-  (dp_handler : LeanStepDatapoint → tactic unit) : Π 
-  (acc : LeanStepState) 
-  (opts : LeanStepOpts) 
-  (bs : list (expr × expr)) 
+meta def lean_step_main_core_aux
+  (decl_nm : name)
+  (decl_tp : expr)
+  (decl_premises : list (expr × expr))
+  (main_pf : expr)
+  (dp_handler : LeanStepDatapoint → tactic unit) : Π
+  (acc : LeanStepState)
+  (opts : LeanStepOpts)
+  (bs : list (expr × expr))
   (addr : expr.address) /- always the current address of `pf` wrt `main_pf` -/
   (pf : expr), tactic (expr_set × name_set × LeanStepState) := λ acc opts bs addr pf,
 (guard (acc.count ≤ opts.rec_limit) <|> tactic.fail format! "[lean_step_main_core_aux] RECURSION LIMIT HIT: {acc.count}") *>
@@ -287,7 +286,7 @@ match acc, opts, bs, addr, pf with
 | acc, opts, bs, addr, e@(lam var_name b_info var_type body) := do lean_step_trace "[lean_step_main_core_aux] LAM CASE", do {
   ⟨[b], new_body⟩ ← tactic.open_n_lambdas e 1,
   -- new_bs ← mcond (tactic.is_proof b) (pure $ b::bs) (pure bs),
-  
+
   new_bs ← (++) bs <$> pure <$> mk_type_annotation b,
 
   ⟨lc_set, c_set, acc⟩ ← lean_step_main_core_aux acc opts new_bs (addr ++ [coord.lam_body]) new_body,
@@ -317,7 +316,7 @@ match acc, opts, bs, addr, pf with
 | acc, opts, bs, addr, e@(pi var_name b_info var_type body) := do lean_step_trace "[lean_step_main_core_aux] PI CASE", do {
   ⟨[b], new_body⟩ ← tactic.open_n_pis e 1,
   -- new_bs ← mcond (tactic.is_proof b) (pure $ b::bs) (pure bs),
-  
+
   new_bs ← (++) bs <$> pure <$> mk_type_annotation b,
 
   ⟨lc_set, c_set, acc⟩ ← lean_step_main_core_aux acc opts new_bs (addr ++ [coord.pi_body]) new_body,
