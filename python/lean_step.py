@@ -7,7 +7,8 @@ from util import files_with_extension
 def get_tactic_state(dp, sep="\t"):
     """
     Args:
-      dp: LeanStepDatapoint in JSON format. The specification of this format is given by the `has_to_tactic_json` instance in `./src/data_util/lean_step.lean`
+      dp: LeanStepDatapoint in JSON format. The specification of this format is given by the
+          `has_to_tactic_json` instance in `./src/data_util/lean_step.lean`
 
     Returns:
       A formatted tactic state.

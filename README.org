@@ -63,6 +63,12 @@ python ./python/parallel_gen_data.py ./test/test0.names ./test/test_parallel/ 8 
 
 python ./python/lean_step.py ./test/test_parallel/ ./test/test_data_gen/
 
+# generate spits
+
+mkdir ./data
+lean --run src/tools/all_decls.lean
+python python/dhash.py ./data/mathlib_decls.log 2 2 ./data/
+
 # run the full raw data pipeline
 
 RAW_DATA_DIR="TODO: populate"
@@ -72,7 +78,7 @@ DEPTH_LIMIT=100 # conservative value: 64
 WEIGHT_LIMIT=2000 # conservative value: 1500
 DECLS_PER_SHARD=100
 
-python ./python/parallel_gen_data.py ./data/decls_split/train.names $RAW_DATA_DIR $N_WORKERS $REC_LIMIT $DEPTH_LIMIT $WEIGHT_LIMIT $DECLS_PER_SHARD
+python ./python/parallel_gen_data.py ./data/train_decls.log $RAW_DATA_DIR $N_WORKERS $REC_LIMIT $DEPTH_LIMIT $WEIGHT_LIMIT $DECLS_PER_SHARD
 #+end_src
 
 ** Dataset extraction
