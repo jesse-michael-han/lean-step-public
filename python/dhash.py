@@ -15,7 +15,7 @@ def hash_string_to_float(arg):
     return fmod(x * mp.pi, mpf(1.0))
 
 
-def get_split(arg, train_threshold=0.96, valid_threshold=0.98):
+def get_split(arg, train_threshold=0.92, valid_threshold=0.96):
     float_hash = hash_string_to_float(arg.split()[0])
     if float_hash < train_threshold:
         return "train"
