@@ -3,6 +3,8 @@
 * LeanStep proof term datasets
 This repository contains utilities for extracting various machine learning datasets from the proof terms of Lean's `mathlib`.
 
+This [[https://github.com/jesse-michael-han/lean-step-public/releases/tag/archive][release]] archives the code used for the [[https://arxiv.org/abs/2102.06203][PACT paper]].
+
 ** Supported datasets
 Currently, we support the following datasets for the following tasks:
 
@@ -38,20 +40,22 @@ Conditioned on a pretty-printed proof term with a subterm masked out, predict th
 
  - Result elaboration
    - Input: partial result term; output: verbose partial result term
-     
+
+
 ** Raw dataset generation
+
 #+begin_src bash
 git clone git@github.com:jesse-michael-han/lean-step-public $LEAN_STEP_DIR
 
 cd $LEAN_STEP_DIR
 
-# git checkout origin/leanstep-gptf
-
 leanpkg configure
+
+leanproject get-mathlib-cache
 
 bash ./_target/deps/mathlib/scripts/mk_all.sh
 
-leanpkg build # needs to build everything, takes 20-30m
+leanpkg build  # needs to build everything, takes 20-30m
 
 # test full data pipeline
 
@@ -63,6 +67,12 @@ python ./python/parallel_gen_data.py ./test/test0.names ./test/test_parallel/ 8 
 
 python ./python/lean_step.py ./test/test_parallel/ ./test/test_data_gen/
 
+# generate splits
+
+mkdir ./data
+lean --run src/tools/all_decls.lean
+python python/dhash.py ./data/mathlib_decls.log ./data/
+
 # run the full raw data pipeline
 
 RAW_DATA_DIR="TODO: populate"
@@ -72,7 +82,7 @@ DEPTH_LIMIT=100 # conservative value: 64
 WEIGHT_LIMIT=2000 # conservative value: 1500
 DECLS_PER_SHARD=100
 
-python ./python/parallel_gen_data.py ./data/decls_split/train.names $RAW_DATA_DIR $N_WORKERS $REC_LIMIT $DEPTH_LIMIT $WEIGHT_LIMIT $DECLS_PER_SHARD
+python ./python/parallel_gen_data.py ./data/train_decls.log $RAW_DATA_DIR $N_WORKERS $REC_LIMIT $DEPTH_LIMIT $WEIGHT_LIMIT $DECLS_PER_SHARD
 #+end_src
 
 ** Dataset extraction
