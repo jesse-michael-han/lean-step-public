@@ -63,7 +63,7 @@ python ./python/parallel_gen_data.py ./test/test0.names ./test/test_parallel/ 8 
 
 python ./python/lean_step.py ./test/test_parallel/ ./test/test_data_gen/
 
-# generate spits
+# generate splits
 
 mkdir ./data
 lean --run src/tools/all_decls.lean
