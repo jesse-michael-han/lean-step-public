@@ -69,7 +69,7 @@ python ./python/lean_step.py ./test/test_parallel/ ./test/test_data_gen/
 
 mkdir ./data
 lean --run src/tools/all_decls.lean
-python python/dhash.py ./data/mathlib_decls.log 2 2 ./data/
+python python/dhash.py ./data/mathlib_decls.log ./data/
 
 # run the full raw data pipeline
 
