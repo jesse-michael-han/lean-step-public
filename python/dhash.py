@@ -30,28 +30,16 @@ def _parse_main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument("decls_file")
-    parser.add_argument("valid_frac", type=float, help="number between 0 and 100", default=2)
-    parser.add_argument("test_frac", type=float, help="number between 0 and 100", default=2)
     parser.add_argument("dest_dir")
     return parser.parse_args()
 
 
-def float_in_unit_interval(x):
-    return 0 <= x and x <= 1
-
-
 def _main(decls_file: str, valid_frac: float, test_frac: float, dest_dir: str):
-    valid_frac = 0.01 * valid_frac
-    test_frac = 0.01 * test_frac
     with open(decls_file, "r") as f:
         decls = f.readlines()
     dataset = collections.defaultdict(list)
-    train_threshold = 1.0 - valid_frac - test_frac
-    valid_threshold = 1.0 - test_frac
-    print(f"TRAIN THRESHOLD: {train_threshold} VALID_THRESHOLD: {valid_threshold}")
-    assert float_in_unit_interval(train_threshold) and float_in_unit_interval(valid_threshold)
     for decl in decls:
-        dataset[get_split(decl, train_threshold, valid_threshold)].append(decl)
+        dataset[get_split(decl)].append(decl)
 
     if not os.path.exists(dest_dir):
         os.makedirs(dest_dir)
