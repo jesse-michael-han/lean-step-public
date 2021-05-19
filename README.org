@@ -3,6 +3,8 @@
 * LeanStep proof term datasets
 This repository contains utilities for extracting various machine learning datasets from the proof terms of Lean's `mathlib`.
 
+This [[https://github.com/jesse-michael-han/lean-step-public/releases/tag/archive][release]] archives the code used for the [[https://arxiv.org/abs/2102.06203][PACT paper]].
+
 ** Supported datasets
 Currently, we support the following datasets for the following tasks:
 
