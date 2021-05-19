@@ -34,7 +34,7 @@ def _parse_main():
     return parser.parse_args()
 
 
-def _main(decls_file: str, valid_frac: float, test_frac: float, dest_dir: str):
+def _main(decls_file: str, dest_dir: str):
     with open(decls_file, "r") as f:
         decls = f.readlines()
     dataset = collections.defaultdict(list)
