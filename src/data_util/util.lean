@@ -63,6 +63,20 @@ end io
 end io
 
 
+section name
+
+namespace name
+
+meta def is_aux : name → bool
+| name.anonymous := ff
+| (name.mk_string str nm) := (||) ((list.head str.to_list) = '_') (is_aux nm)
+| (name.mk_numeral _ nm) := is_aux nm
+
+end name
+
+end name
+
+
 section util
 
 namespace io
@@ -70,6 +84,13 @@ namespace io
 meta def fail' {α} (fmt : format) : io α := io.fail $ format.to_string fmt
 
 meta def put_str_ln' : Π (fmt : format), io unit := io.put_str_ln ∘ format.to_string
+
+namespace fs
+
+def put_str_ln_flush (h : handle) (s : string) : io unit :=
+put_str h s *> put_str h "\n" *> flush h
+
+end fs
 
 end io
 

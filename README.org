@@ -49,7 +49,7 @@ cd $LEAN_STEP_DIR
 
 leanpkg configure
 
-python python/make_all_lean.py  # generates src/all.lean
+bash ./_target/deps/mathlib/scripts/mk_all.sh
 
 leanpkg build  # needs to build everything, takes 20-30m
 
