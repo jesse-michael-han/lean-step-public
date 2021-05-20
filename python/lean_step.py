@@ -381,14 +381,19 @@ def create_datasets(data_dir: str, dest_dir: str):
     json_files = files_with_extension(data_dir, "json")
     print("JSON FILES: ", json_files)
     for json_file in tqdm(json_files):
-        with open(json_file, "r") as json_file_handle:
-            for json_line in json_file_handle:
-                try:
-                    dp = json.loads(json_line)
-                    for dc in dataset_creators:
-                        dc.process_dp(dp)
-                except Exception as e:
-                    print(f"BAD LINE IN FILE: {json_file} EXCEPTION: {e}")
+        line = 0
+        try:
+            with open(json_file, "r") as json_file_handle:
+                for json_line in json_file_handle:
+                    line += 1
+                    try:
+                        dp = json.loads(json_line)
+                        for dc in dataset_creators:
+                            dc.process_dp(dp)
+                    except Exception as e:
+                        print(f"BAD LINE IN FILE: {json_file} EXCEPTION: {e}")
+        except Exception as e:
+            print(f"BAD FILE: {json_file} LINE: {line}: EXCEPTION: {e}")
 
 
 def create_lm_sequence(dp_json):
