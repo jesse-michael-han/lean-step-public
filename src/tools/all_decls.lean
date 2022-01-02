@@ -12,7 +12,8 @@ meta def main : io unit := do {
   f ← io.mk_file_handle dest io.mode.append,
   io.run_tactic' $ do {
     env ← get_env,
-    decls ← list.filter (λ d, !(ignore_decls_fn env d)) <$> lint_mathlib_decls,
+    mathlib_dir ← get_mathlib_dir,
+    decls ← list.filter (λ d, !(ignore_decls_fn env d)) <$> (lint_project_decls mathlib_dir),
     for_ decls $ λ decl, do {
       let decl_name := decl.to_name.to_string,
       tactic.unsafe_run_io $ io.fs.put_str_ln f decl_name,

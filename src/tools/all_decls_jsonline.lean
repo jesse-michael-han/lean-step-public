@@ -25,7 +25,8 @@ meta def main : io unit := do {
 
   io.run_tactic' $ do {
     env ← get_env,
-    decls ← list.filter (λ d, !(ignore_decls_fn env d)) <$> lint_mathlib_decls,
+    mathlib_dir ← get_mathlib_dir,
+    decls ← list.filter (λ d, !(ignore_decls_fn env d)) <$> (lint_project_decls mathlib_dir),
     for_ decls $ λ decl, do {
       msg ← mk_decl_msg decl,
       tactic.unsafe_run_io $ io.fs.put_str_ln f msg,
