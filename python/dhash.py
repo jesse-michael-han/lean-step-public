@@ -1,7 +1,8 @@
-from mpmath import mp, mpf, fmod
-import hashlib
 import collections
+import hashlib
 import os
+
+from mpmath import mp, mpf, fmod
 
 mp.dps = 50
 
@@ -15,7 +16,7 @@ def hash_string_to_float(arg):
     return fmod(x * mp.pi, mpf(1.0))
 
 
-def get_split(arg, train_threshold=0.92, valid_threshold=0.96):
+def get_split(arg, train_threshold, valid_threshold):
     float_hash = hash_string_to_float(arg.split()[0])
     if float_hash < train_threshold:
         return "train"
@@ -31,15 +32,17 @@ def _parse_main():
     parser = argparse.ArgumentParser()
     parser.add_argument("decls_file")
     parser.add_argument("dest_dir")
+    parser.add_argument("--train_threshold", type=float, default=0.92)
+    parser.add_argument("--valid_threshold", type=float, default=0.96)
     return parser.parse_args()
 
 
-def _main(decls_file: str, dest_dir: str):
+def _main(decls_file: str, dest_dir: str, train_threshold: float, valid_threshold: float):
     with open(decls_file, "r") as f:
         decls = f.readlines()
     dataset = collections.defaultdict(list)
     for decl in decls:
-        dataset[get_split(decl)].append(decl)
+        dataset[get_split(decl, train_threshold=train_threshold, valid_threshold=valid_threshold)].append(decl)
 
     if not os.path.exists(dest_dir):
         os.makedirs(dest_dir)
