@@ -1,6 +1,8 @@
-import os
 import json
+import os
+
 from tqdm import tqdm
+
 from util import files_with_extension
 
 
@@ -104,7 +106,7 @@ class DatasetCreator:
     def __init__(self, fp):
         self.fp = fp
 
-    def process_dp(dp):
+    def process_dp(self, dp):
         raise NotImplementedError
 
 
@@ -157,7 +159,7 @@ class PremiseClassificationDatasetCreator(DatasetCreator):
                     result = {
                         "goal": ts,
                         "classify_premise": (
-                            "(" + premise_nm + " : " + premise_tp + ")" + f" {bit}"
+                                "(" + premise_nm + " : " + premise_tp + ")" + f" {bit}"
                         ),
                     }
                     result_msg = json.dumps(result)
