@@ -132,7 +132,8 @@ class ProofStepClassificationDatasetCreator(DatasetCreator):
     def process_dp(self, dp):
         ts, positive_hyps = get_proof_step_classification_datapoint(dp)
         positive_hyps = tuple(map(to_type_annotation, positive_hyps))
-        result = {"goal": ts, "classify_locals": positive_hyps}
+        # result = {"goal": ts, "classify_locals": positive_hyps}
+        result = {"goal": ts, "classify_locals": '♬'.join(positive_hyps)}
         # result_msg = json.dumps(result)
         guard = lambda: len(positive_hyps) > 0  # noqa: E731
         if guard() and (not (ts, positive_hyps) in self.seen):
