@@ -126,13 +126,17 @@ class ProofStepClassificationDatasetCreator(DatasetCreator):
     """
 
     def __init__(self, fp):
-        super().__init__(fp, fieldnames=['goal', 'classify_locals'])
+        super().__init__(fp, fieldnames=['goal', *[f'classify_locals_{i}' for i in range(10)]])
         self.seen = set()
 
     def process_dp(self, dp):
         ts, positive_hyps = get_proof_step_classification_datapoint(dp)
         positive_hyps = tuple(map(to_type_annotation, positive_hyps))
-        result = {"goal": ts, "classify_locals": positive_hyps}
+        # result = {"goal": ts, "classify_locals": positive_hyps}
+        result = {
+            "goal": ts,
+            **{f"classify_locals_{i}": positive_hyp for i, positive_hyp in enumerate(positive_hyps)},
+        }
         # result_msg = json.dumps(result)
         guard = lambda: len(positive_hyps) > 0  # noqa: E731
         if guard() and (not (ts, positive_hyps) in self.seen):
