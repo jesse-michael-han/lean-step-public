@@ -104,7 +104,7 @@ class DatasetCreator:
     def __init__(self, fp):
         self.fp = fp
 
-    def process_dp(dp):
+    def process_dp(self, dp):
         raise NotImplementedError
 
 
