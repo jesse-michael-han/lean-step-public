@@ -1,6 +1,10 @@
-import os
+import csv
 import json
+import os
+from typing import List
+
 from tqdm import tqdm
+
 from util import files_with_extension
 
 
@@ -101,10 +105,11 @@ def length_guard(result):
 
 
 class DatasetCreator:
-    def __init__(self, fp):
-        self.fp = fp
+    def __init__(self, fp, *, fieldnames: List[str]):
+        self.writer = csv.DictWriter(fp, fieldnames=fieldnames)
+        self.writer.writeheader()
 
-    def process_dp(dp):
+    def process_dp(self, dp):
         raise NotImplementedError
 
 
@@ -121,18 +126,20 @@ class ProofStepClassificationDatasetCreator(DatasetCreator):
     """
 
     def __init__(self, fp):
-        super().__init__(fp)
+        super().__init__(fp, fieldnames=['goal', 'classify_locals'])
         self.seen = set()
 
     def process_dp(self, dp):
         ts, positive_hyps = get_proof_step_classification_datapoint(dp)
         positive_hyps = tuple(map(to_type_annotation, positive_hyps))
-        result = {"goal": ts, "classify_locals": positive_hyps}
-        result_msg = json.dumps(result)
+        # result = {"goal": ts, "classify_locals": positive_hyps}
+        result = {"goal": ts, "classify_locals": '♬'.join(positive_hyps)}
+        # result_msg = json.dumps(result)
         guard = lambda: len(positive_hyps) > 0  # noqa: E731
         if guard() and (not (ts, positive_hyps) in self.seen):
             self.seen.add((ts, positive_hyps))
-            self.fp.write(result_msg + "\n")
+            self.writer.writerow(result)
+            # self.fp.write(result_msg + "\n")
 
 
 class PremiseClassificationDatasetCreator(DatasetCreator):
@@ -144,7 +151,7 @@ class PremiseClassificationDatasetCreator(DatasetCreator):
     """
 
     def __init__(self, fp):
-        super().__init__(fp)
+        super().__init__(fp, fieldnames=['goal', 'classify_premise'])
         self.seen = set()
 
     def process_dp(self, dp):
@@ -157,11 +164,12 @@ class PremiseClassificationDatasetCreator(DatasetCreator):
                     result = {
                         "goal": ts,
                         "classify_premise": (
-                            "(" + premise_nm + " : " + premise_tp + ")" + f" {bit}"
+                                "(" + premise_nm + " : " + premise_tp + ")" + f" {bit}"
                         ),
                     }
-                    result_msg = json.dumps(result)
-                    self.fp.write(result_msg + "\n")
+                    # result_msg = json.dumps(result)
+                    # self.fp.write(result_msg + "\n")
+                    self.writer.writerow(result)
 
 
 class TheoremNamePredictionDatasetCreator(DatasetCreator):
@@ -175,7 +183,7 @@ class TheoremNamePredictionDatasetCreator(DatasetCreator):
     """
 
     def __init__(self, fp):
-        super().__init__(fp)
+        super().__init__(fp, fieldnames=['type', 'name'])
         self.seen = set()
 
     def process_dp(self, dp):
@@ -185,8 +193,9 @@ class TheoremNamePredictionDatasetCreator(DatasetCreator):
         else:
             self.seen.add(nm)
             result = {"type": tp, "name": nm}
-            result_msg = json.dumps(result)
-            self.fp.write(result_msg + "\n")
+            # result_msg = json.dumps(result)
+            # self.fp.write(result_msg + "\n")
+            self.writer.writerow(result)
 
 
 class NextLemmaPredictionDatasetCreator(DatasetCreator):
@@ -198,7 +207,7 @@ class NextLemmaPredictionDatasetCreator(DatasetCreator):
     """
 
     def __init__(self, fp):
-        super().__init__(fp)
+        super().__init__(fp, fieldnames=['goal', 'next_lemma'])
         self.seen = set()
 
     def process_dp(self, dp):
@@ -209,8 +218,9 @@ class NextLemmaPredictionDatasetCreator(DatasetCreator):
             if not ((ts, next_lemma) in self.seen):
                 self.seen.add((ts, next_lemma))
                 result = {"goal": ts, "next_lemma": next_lemma}
-                result_msg = json.dumps(result)
-                self.fp.write(result_msg + "\n")
+                # result_msg = json.dumps(result)
+                # self.fp.write(result_msg + "\n")
+                self.writer.writerow(result)
 
 
 class ProofTermPredictionDatasetCreator(DatasetCreator):
@@ -221,7 +231,7 @@ class ProofTermPredictionDatasetCreator(DatasetCreator):
     """
 
     def __init__(self, fp):
-        super().__init__(fp)
+        super().__init__(fp, fieldnames=['goal', 'proof_term'])
         self.seen = set()
 
     def process_dp(self, dp):
@@ -230,8 +240,9 @@ class ProofTermPredictionDatasetCreator(DatasetCreator):
             if not ((ts, proof_term) in self.seen):
                 self.seen.add((ts, proof_term))
                 result = {"goal": ts, "proof_term": proof_term}
-                result_msg = json.dumps(result)
-                self.fp.write(result_msg + "\n")
+                # result_msg = json.dumps(result)
+                # self.fp.write(result_msg + "\n")
+                self.writer.writerow(result)
 
 
 class SkipProofDatasetCreator(DatasetCreator):
@@ -242,7 +253,7 @@ class SkipProofDatasetCreator(DatasetCreator):
     """
 
     def __init__(self, fp):
-        super().__init__(fp)
+        super().__init__(fp, fieldnames=['skip_proof', 'proof_term'])
         self.seen = set()
 
     def process_dp(self, dp):
@@ -252,8 +263,9 @@ class SkipProofDatasetCreator(DatasetCreator):
             if not ((result, proof_term) in self.seen):
                 self.seen.add((result, proof_term))
                 result = {"skip_proof": result, "proof_term": proof_term}
-                result_msg = json.dumps(result)
-                self.fp.write(result_msg + "\n")
+                # result_msg = json.dumps(result)
+                # self.fp.write(result_msg + "\n")
+                self.writer.writerow(result)
 
 
 class TypePredictionDatasetCreator(DatasetCreator):
@@ -264,7 +276,7 @@ class TypePredictionDatasetCreator(DatasetCreator):
     """
 
     def __init__(self, fp):
-        super().__init__(fp)
+        super().__init__(fp, fieldnames=['skip_proof', 'goal'])
         self.seen = set()
 
     def process_dp(self, dp):
@@ -274,8 +286,9 @@ class TypePredictionDatasetCreator(DatasetCreator):
             if not ((result, goal) in self.seen):
                 self.seen.add((result, goal))
                 result = {"skip_proof": result, "goal": goal}
-                result_msg = json.dumps(result)
-                self.fp.write(result_msg + "\n")
+                # result_msg = json.dumps(result)
+                # self.fp.write(result_msg + "\n")
+                self.writer.writerow(result)
 
 
 class TSElabDatasetCreator(DatasetCreator):
@@ -286,7 +299,7 @@ class TSElabDatasetCreator(DatasetCreator):
     """
 
     def __init__(self, fp):
-        super().__init__(fp)
+        super().__init__(fp, fieldnames=['goal', 'elab_goal'])
         self.seen = set()
 
     def process_dp(self, dp):
@@ -296,8 +309,9 @@ class TSElabDatasetCreator(DatasetCreator):
             if not ((goal, goal_elab) in self.seen):
                 self.seen.add((goal, goal_elab))
                 result = {"goal": goal, "elab_goal": goal_elab}
-                result_msg = json.dumps(result)
-                self.fp.write(result_msg + "\n")
+                # result_msg = json.dumps(result)
+                # self.fp.write(result_msg + "\n")
+                self.writer.writerow(result)
 
 
 class ProofTermElabDatasetCreator(DatasetCreator):
@@ -308,7 +322,7 @@ class ProofTermElabDatasetCreator(DatasetCreator):
     """
 
     def __init__(self, fp):
-        super().__init__(fp)
+        super().__init__(fp, fieldnames=['proof_term', 'elab_proof_term'])
         self.seen = set()
 
     def process_dp(self, dp):
@@ -318,8 +332,9 @@ class ProofTermElabDatasetCreator(DatasetCreator):
             if not ((proof_term, proof_term_elab) in self.seen):
                 self.seen.add((proof_term, proof_term_elab))
                 result = {"proof_term": proof_term, "elab_proof_term": proof_term_elab}
-                result_msg = json.dumps(result)
-                self.fp.write(result_msg + "\n")
+                # result_msg = json.dumps(result)
+                # self.fp.write(result_msg + "\n")
+                self.writer.writerow(result)
 
 
 class ResultElabDatasetCreator(DatasetCreator):
@@ -329,7 +344,7 @@ class ResultElabDatasetCreator(DatasetCreator):
     """
 
     def __init__(self, fp):
-        super().__init__(fp)
+        super().__init__(fp, fieldnames=['result', 'result_elab'])
         self.seen = set()
 
     def process_dp(self, dp):
@@ -339,8 +354,9 @@ class ResultElabDatasetCreator(DatasetCreator):
             if not ((result, result_elab) in self.seen):
                 self.seen.add((result, result_elab))
                 result = {"result": result, "result_elab": result_elab}
-                result_msg = json.dumps(result)
-                self.fp.write(result_msg + "\n")
+                # result_msg = json.dumps(result)
+                # self.fp.write(result_msg + "\n")
+                self.writer.writerow(result)
 
 
 def create_datasets(data_dir: str, dest_dir: str):
@@ -354,25 +370,25 @@ def create_datasets(data_dir: str, dest_dir: str):
 
     dataset_creators = [
         ProofStepClassificationDatasetCreator(
-            open(os.path.join(dest_dir, "proof_step_classification.json"), "w")
+            open(os.path.join(dest_dir, "proof_step_classification.csv"), "w")
         ),
         PremiseClassificationDatasetCreator(
-            open(os.path.join(dest_dir, "premise_classification.json"), "w")
+            open(os.path.join(dest_dir, "premise_classification.csv"), "w")
         ),
         TheoremNamePredictionDatasetCreator(
-            open(os.path.join(dest_dir, "theorem_name_prediction.json"), "w")
+            open(os.path.join(dest_dir, "theorem_name_prediction.csv"), "w")
         ),
         NextLemmaPredictionDatasetCreator(
-            open(os.path.join(dest_dir, "next_lemma_prediction.json"), "w")
+            open(os.path.join(dest_dir, "next_lemma_prediction.csv"), "w")
         ),
         ProofTermPredictionDatasetCreator(
-            open(os.path.join(dest_dir, "proof_term_prediction.json"), "w")
+            open(os.path.join(dest_dir, "proof_term_prediction.csv"), "w")
         ),
-        SkipProofDatasetCreator(open(os.path.join(dest_dir, "skip_proof.json"), "w")),
-        TypePredictionDatasetCreator(open(os.path.join(dest_dir, "type_prediction.json"), "w")),
-        TSElabDatasetCreator(open(os.path.join(dest_dir, "ts_elab.json"), "w")),
-        ProofTermElabDatasetCreator(open(os.path.join(dest_dir, "proof_term_elab.json"), "w")),
-        ResultElabDatasetCreator(open(os.path.join(dest_dir, "result_elab.json"), "w")),
+        SkipProofDatasetCreator(open(os.path.join(dest_dir, "skip_proof.csv"), "w")),
+        TypePredictionDatasetCreator(open(os.path.join(dest_dir, "type_prediction.csv"), "w")),
+        TSElabDatasetCreator(open(os.path.join(dest_dir, "ts_elab.csv"), "w")),
+        ProofTermElabDatasetCreator(open(os.path.join(dest_dir, "proof_term_elab.csv"), "w")),
+        ResultElabDatasetCreator(open(os.path.join(dest_dir, "result_elab.csv"), "w")),
     ]
 
     if not os.path.exists(dest_dir):
